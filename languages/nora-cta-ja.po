@@ -1,0 +1,60 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nora-cta\n"
+"POT-Creation-Date: 2022-03-25 12:21+0900\n"
+"PO-Revision-Date: 2022-03-25 12:22+0900\n"
+"Last-Translator: \n"
+"Language-Team: norando\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.0.1\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: nora_cta.php:235 nora_cta.php:364
+msgid "CTA Setting"
+msgstr "CTA設定"
+
+#: nora_cta.php:256
+msgid "* No default CTA"
+msgstr "※デフォルトCTAが設定されていません"
+
+#: nora_cta.php:260
+msgid "main copy"
+msgstr "メインコピー"
+
+#: nora_cta.php:261
+msgid "description"
+msgstr "説明文"
+
+#: nora_cta.php:262
+msgid "link text"
+msgstr "リンクテキスト"
+
+#: nora_cta.php:265
+msgid "footer"
+msgstr "フッター"
+
+#: nora_cta.php:269
+msgid "Set as default CTA"
+msgstr "デフォルトのCTAに設定する"
+
+#: nora_cta.php:302 nora_cta.php:329
+msgid "Category CTA"
+msgstr "カテゴリーCTA"
+
+#: nora_cta.php:305 nora_cta.php:331 nora_cta.php:378
+msgid "not set"
+msgstr "設定なし"
+
+#: nora_cta.php:306 nora_cta.php:332 nora_cta.php:379
+msgid "hide"
+msgstr "表示しない"
+
+#: nora_cta.php:319 nora_cta.php:344
+msgid "Default CTA for category"
+msgstr "カテゴリーのデフォルトCTA"

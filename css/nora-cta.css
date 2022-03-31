@@ -1,0 +1,43 @@
+.nora-cta {
+  padding: 16px 16px 32px;
+  border: solid 1px #aaa;
+  text-align: center;
+}
+
+.nora-cta_title {
+  margin-bottom: 16px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.nora-cta_disc {
+  margin-bottom: 16px;
+  text-align: center
+}
+
+.nora-cta_btn {
+  display: inline-block;
+  margin: 0 auto;
+  padding: 16px 32px;
+  color: #f7f7fa;
+  border: solid 1px #b82828;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 5px;
+  background-color: #b82828;
+  -webkit-transition: all .2s linear 0s;
+  transition: all .2s linear 0s
+}
+
+.nora-cta_btn:hover {
+  color: #15151c;
+  text-decoration: none;
+  border-color: #15151c;
+  background-color: transparent;
+  cursor: pointer
+}
+
+.nora-cta_footer{
+  margin-top: 16px;
+}
