@@ -3,7 +3,7 @@
  * Plugin Name: nora-cta
  * Plugin URI:  https://norando.net/nora-cta
  * Description: Nora-CTA plugin create and manage simple call-to-action.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Author:      norando
  * Author URI:  https://norando.net
  * License:     GPLv2 or later
@@ -124,7 +124,7 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 				if ( ! empty( $term_cta ) ) {
 					if ( ! empty( $term_cta_id ) ) {
 						// 記事にCTAが登録されたカテゴリーが複数設定されている場合
-						if ( 'hide' == $term_cta ) {
+						if ( -1 == $term_cta ) {
 							// 「表示しない」の場合は他に設定されたCTAが優先
 							continue;
 						}
@@ -168,7 +168,7 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 			}
 
 			// 表示しない設定
-			if ( 'hide' == $cta_id ) {
+			if ( -1 == $cta_id ) {
 				return false;
 			}
 
@@ -218,7 +218,7 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 
 			if ( ! empty( $cta['footer'] ) ) {
 				$cta_content .= '<div class="nora-cta_footer">';
-				$cta_content .= $cta['footer'];
+				$cta_content .= wp_kses_post( $cta['footer'] );
 				$cta_content .= '</div>';
 			}
 
@@ -339,20 +339,20 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 
 			$default = get_option( 'nora_cta_default', true );
 			if ( empty( $default ) ) {
-				_e( '* No default CTA', 'nora-cta' );
+				esc_html_e( '* No default CTA', 'nora-cta' );
 			}
 			?>
 			<ul class="nora-cta-meta">
-				<li class="nora-cta-meta_item"><label class="nora-cta-meta_label" for="cta_title"><?php _e( 'main copy', 'nora-cta' ); ?></label><input type="text" name="nora_cta[title]" id="cta_title" value="<?php echo wp_kses_post( $title ); ?>"></li>
-				<li class="nora-cta-meta_item"><label class="nora-cta-meta_label" for="cta_disc"><?php _e( 'description', 'nora-cta' ); ?></label><input type="text" name="nora_cta[disc]" id="cta_disc" value="<?php echo wp_kses_post( $disc ); ?>"></li>
-				<li class="nora-cta-meta_item"><label class="nora-cta-meta_label" for="cta_btn-text"><?php _e( 'link text', 'nora-cta' ); ?></label><input type="text" name="nora_cta[btn-text]" id="cta_btn-text" value="<?php echo wp_kses_post( $btn_text ); ?>"></li>
+				<li class="nora-cta-meta_item"><label class="nora-cta-meta_label" for="cta_title"><?php esc_html_e( 'main copy', 'nora-cta' ); ?></label><input type="text" name="nora_cta[title]" id="cta_title" value="<?php echo wp_kses_post( $title ); ?>"></li>
+				<li class="nora-cta-meta_item"><label class="nora-cta-meta_label" for="cta_disc"><?php esc_html_e( 'description', 'nora-cta' ); ?></label><input type="text" name="nora_cta[disc]" id="cta_disc" value="<?php echo wp_kses_post( $disc ); ?>"></li>
+				<li class="nora-cta-meta_item"><label class="nora-cta-meta_label" for="cta_btn-text"><?php esc_html_e( 'link text', 'nora-cta' ); ?></label><input type="text" name="nora_cta[btn-text]" id="cta_btn-text" value="<?php echo wp_kses_post( $btn_text ); ?>"></li>
 				<li class="nora-cta-meta_item"><label class="nora-cta-meta_label" for="cta_url">URL</label><input type="url" name="nora_cta[url]" id="cta_url" value="<?php echo esc_url( $url ); ?>"></li>
 				<li class="nora-cta-meta_item">
-					<label class="nora-cta-meta_label" for="cta_footer"><?php _e( 'footer', 'nora-cta' ); ?></label>
+					<label class="nora-cta-meta_label" for="cta_footer"><?php esc_html_e( 'footer', 'nora-cta' ); ?></label>
 					<textarea  name="nora_cta[footer]" id="cta_footer" rows="10"><?php echo esc_textarea( $footer ); ?></textarea>
 				</li>
 			</ul>
-			<label for="nora_cta_default"><?php _e( 'Set as default CTA', 'nora-cta' ); ?><input type="checkbox" name="nora_cta_default" id="nora_cta_default" value="<?php echo $post->ID; ?>"<?php echo $default == $post->ID ? ' checked' : ''; ?>></label>
+			<label for="nora_cta_default"><?php esc_html_e( 'Set as default CTA', 'nora-cta' ); ?><input type="checkbox" name="nora_cta_default" id="nora_cta_default" value="<?php echo (int) $post->ID; ?>"<?php echo $default == $post->ID ? ' checked' : ''; ?>></label>
 			<?php
 		}
 
@@ -366,14 +366,14 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 			if ( ! self::check_nonce( $post_id ) ) {
 				return;
 			}
-
-			$cta = ( isset( $_POST['nora_cta'] ) && $_POST['nora_cta'] ) ? $_POST['nora_cta'] : '';
-			if ( ! empty( $cta['footer'] ) ) {
-				$cta['footer'] = stripslashes( $cta['footer'] );
+			if ( isset( $_POST['nora_cta'] ) ) {
+				if ( is_array( $_POST['nora_cta'] ) ) {
+					$cta = map_deep( wp_unslash( $_POST['nora_cta'] ), 'wp_kses_post' );
+					update_post_meta( $post_id, 'nora_cta', $cta );
+				}
 			}
-			update_post_meta( $post_id, 'nora_cta', $cta );
 
-			$default = ( isset( $_POST['nora_cta_default'] ) && $_POST['nora_cta_default'] ) ? $_POST['nora_cta_default'] : '';
+			$default = ( isset( $_POST['nora_cta_default'] ) ) ? (int) $_POST['nora_cta_default'] : '';
 			update_option( 'nora_cta_default', $default );
 		}
 
@@ -390,14 +390,14 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 		public function edit_category_cta( $term ) {
 			self::set_nonce();
 			$nora_cta      = get_term_meta( $term->term_id, 'nora_cta', true );
-			$selected_hide = $nora_cta == 'hide' ? ' selected' : '';
+			$selected_hide = -1 == $nora_cta ? ' selected' : '';
 			?>
 			<tr class="form-field">
-				<th scope="row"><label for="description"><?php _e( 'Category CTA', 'nora-cta' ); ?></label></th>
+				<th scope="row"><label for="description"><?php esc_html_e( 'Category CTA', 'nora-cta' ); ?></label></th>
 				<td>
 					<select name="nora_category_cta" id="nora_category_cta">
-						<option value=""><?php _e( 'not set', 'nora-cta' ); ?></option>
-						<option value="hide"<?php echo $selected_hide; ?>><?php _e( 'hide', 'nora-cta' ); ?></option>
+						<option value=""><?php esc_html_e( 'not set', 'nora-cta' ); ?></option>
+						<option value="-1"<?php echo esc_attr( $selected_hide ); ?>><?php esc_html_e( 'hide', 'nora-cta' ); ?></option>
 						<?php
 						$args = array(
 							'posts_per_page' => -1,
@@ -406,11 +406,11 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 						$ctas = get_posts( $args );
 						foreach ( $ctas as $cta ) {
 							$selected = $nora_cta == $cta->ID ? ' selected' : '';
-							echo '<option value="' . $cta->ID . '"' . $selected . '>' . esc_html( $cta->post_title ) . '</option>';
+							echo '<option value="' . esc_attr( $cta->ID ) . '"' . esc_attr( $selected ) . '>' . esc_html( $cta->post_title ) . '</option>';
 						}
 						?>
 					</select>
-					<p class="description"><?php _e( 'Default CTA for category', 'nora-cta' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Default CTA for category', 'nora-cta' ); ?></p>
 				</td>
 			</tr>
 			<?php
@@ -423,10 +423,10 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 			self::set_nonce();
 			?>
 			<div class="form-field term-description-wrap">
-				<label for="description"><?php _e( 'Category CTA', 'nora-cta' ); ?></label>
+				<label for="description"><?php esc_html_e( 'Category CTA', 'nora-cta' ); ?></label>
 				<select name="nora_category_cta" id="nora_category_cta">
-					<option value=""><?php _e( 'not set', 'nora-cta' ); ?></option>
-					<option value="hide"><?php _e( 'hide', 'nora-cta' ); ?></option>
+					<option value=""><?php esc_html_e( 'not set', 'nora-cta' ); ?></option>
+					<option value="-1"><?php esc_html_e( 'hide', 'nora-cta' ); ?></option>
 					<?php
 					$args = array(
 						'posts_per_page' => -1,
@@ -434,11 +434,11 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 					);
 					$ctas = get_posts( $args );
 					foreach ( $ctas as $cta ) {
-						echo '<option value="' . $cta->ID . '">' . esc_html( $cta->post_title ) . '</option>';
+						echo '<option value="' . esc_attr( $cta->ID ) . '">' . esc_html( $cta->post_title ) . '</option>';
 					}
 					?>
 				</select>
-				<p class="description"><?php _e( 'Default CTA for category', 'nora-cta' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Default CTA for category', 'nora-cta' ); ?></p>
 			</div>
 			<?php
 		}
@@ -450,10 +450,11 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 		 */
 		public function save_category_cta( $term_id ) {
 			if ( ! self::check_nonce( $term_id ) ) {
-				return; }
+				return;
+			}
 
 			if ( isset( $_POST['nora_category_cta'] ) ) {
-				update_term_meta( $term_id, 'nora_cta', $_POST['nora_category_cta'] );
+				update_term_meta( $term_id, 'nora_cta', (int) $_POST['nora_category_cta'] );
 			}
 		}
 
@@ -483,11 +484,11 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 		public function post_cta_setting( $post ) {
 			self::set_nonce();
 			$nora_cta      = get_post_meta( $post->ID, 'nora_cta', true );
-			$selected_hide = $nora_cta == 'hide' ? ' selected' : '';
+			$selected_hide = -1 == $nora_cta ? ' selected' : '';
 			?>
 		<select name="nora_post_cta" id="nora_post_cta">
-			<option value=""><?php _e( 'not set', 'nora-cta' ); ?></option>
-			<option value="hide"<?php echo $selected_hide; ?>><?php _e( 'hide', 'nora-cta' ); ?></option>
+			<option value=""><?php esc_html_e( 'not set', 'nora-cta' ); ?></option>
+			<option value="-1"<?php echo esc_attr( $selected_hide ); ?>><?php esc_html_e( 'hide', 'nora-cta' ); ?></option>
 			<?php
 			$args = array(
 				'posts_per_page' => -1,
@@ -496,7 +497,7 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 			$ctas = get_posts( $args );
 			foreach ( $ctas as $cta ) {
 				$selected = $nora_cta == $cta->ID ? ' selected' : '';
-				echo '<option value="' . $cta->ID . '"' . $selected . '>' . esc_html($cta->post_title) . '</option>';
+				echo '<option value="' . esc_attr( $cta->ID ) . '"' . esc_attr( $selected ) . '>' . esc_html( $cta->post_title ) . '</option>';
 			}
 			?>
 		</select>
@@ -513,7 +514,7 @@ if ( ! class_exists( 'Nora_CTA' ) ) {
 				return;
 			}
 			if ( isset( $_POST['nora_post_cta'] ) ) {
-				update_post_meta( $post_id, 'nora_cta', $_POST['nora_post_cta'] );
+				update_post_meta( $post_id, 'nora_cta', (int) $_POST['nora_post_cta'] );
 			}
 		}
 	}
